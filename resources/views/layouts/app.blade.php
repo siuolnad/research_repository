@@ -30,7 +30,6 @@ if (document.documentElement.getAttribute('data-rail') === '1') {
     <div class="brand">
         <div class="brand-text">
             <div class="wordmark">Research Repository</div>
-            <div class="sub">Research proposals</div>
         </div>
         <button class="collapse-btn" id="collapse-btn" aria-expanded="true" title="Collapse sidebar" aria-label="Collapse sidebar">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -39,8 +38,8 @@ if (document.documentElement.getAttribute('data-rail') === '1') {
         </button>
     </div>
 
-    <nav class="nav" aria-label="Repository views">
-        <div class="nav-label">Repository views</div>
+    <nav class="nav" aria-label="Research proposal">
+        <div class="nav-label">Research proposal</div>
 
         <a class="nav-item {{ $activeStatus === '' && request()->routeIs('proposals.index') ? 'active' : '' }}" href="{{ route('proposals.index') }}" title="Show all proposals">
             <svg class="nav-ico all" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
