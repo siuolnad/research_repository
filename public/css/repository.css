@@ -288,6 +288,72 @@ a { color: inherit; }
 .head-actions input[type="search"] { width: 230px; }
 .head-actions input[type="number"] { width: 96px; }
 
+/* Search, year and Filter share one bar so they read as a single control. */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 5px 0 12px;
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.filter-bar:hover { border-color: var(--ink-soft); }
+.filter-bar:focus-within {
+    border-color: var(--magistrate);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--magistrate) 18%, transparent);
+}
+.filter-icon { flex-shrink: 0; color: var(--ink-soft); }
+.head-actions .filter-bar input {
+    height: 100%;
+    padding: 0 10px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+}
+.head-actions .filter-bar input:focus-visible,
+.filter-bar select:focus-visible { outline: none; }
+.filter-select { position: relative; display: flex; align-items: center; height: 100%; padding-left: 8px; cursor: pointer; }
+.filter-select select {
+    height: 100%;
+    min-width: 128px;
+    padding: 0 24px 0 8px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    appearance: none;
+    cursor: pointer;
+}
+.filter-select select option { color: var(--ink); background: var(--card); }
+.filter-chevron { position: absolute; right: 8px; color: var(--ink-soft); pointer-events: none; }
+.filter-select:hover .filter-chevron { color: var(--ink); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--rule); box-shadow: inset 0 0 0 1.5px var(--ink-soft); }
+.status-dot.new { background: var(--st-new); box-shadow: none; }
+.status-dot.approved { background: var(--st-approved); box-shadow: none; }
+.status-dot.disapproved { background: var(--st-disapproved); box-shadow: none; }
+.head-actions .filter-bar input[type="search"] { width: 240px; }
+.head-actions .filter-bar input[type="number"] { width: 78px; }
+.filter-bar input[type="number"]::-webkit-inner-spin-button { display: none; }
+.filter-divider { width: 1px; height: 20px; background: var(--rule); }
+.filter-submit {
+    height: 30px;
+    padding: 0 14px;
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+}
+.filter-submit:hover { border-color: var(--ink-soft); }
+.filter-clear { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; }
+.filter-clear:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.head-actions .btn-primary { height: 40px; }
+
 input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible {
     outline: 2px solid var(--magistrate);
     outline-offset: 1px;
@@ -881,7 +947,8 @@ a.docket-badge:hover { color: var(--brass); }
     .content { margin-left: 0; padding: 22px 18px 90px; }
     .menu-btn { display: inline-block; }
     .collapse-btn { display: none; }
-    .head-actions input[type="search"] { width: 100%; flex: 1 1 160px; }
+    .filter-bar { flex: 1 1 100%; }
+    .head-actions .filter-bar input[type="search"] { flex: 1; width: auto; min-width: 0; }
     .field-row { grid-template-columns: 1fr; }
     .card-head { flex-direction: column; }
     .status-pill { align-self: flex-start; }

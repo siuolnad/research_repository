@@ -9,13 +9,40 @@
             {{ ($filters['status'] ?? null) ? \App\Enums\ProposalStatus::from($filters['status'])->label() : 'All proposals' }}
         </h1>
 
+        @php($isReviewer = \App\Enums\UserRole::current()->canDecide())
+
         <div class="head-actions">
-            @if (! empty($filters['status']))
+            @if (! $isReviewer && ! empty($filters['status']))
                 <input type="hidden" name="status" value="{{ $filters['status'] }}">
             @endif
-            <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search title or abstract" aria-label="Search proposals">
-            <input type="number" name="year" value="{{ $filters['year'] ?? '' }}" placeholder="Year" min="1900" max="2100" aria-label="Filter by start year">
-            <button type="submit" class="btn-ghost">Filter</button>
+            <div class="filter-bar">
+                <svg class="filter-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="m10.5 10.5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <input type="search" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Search title or abstract" aria-label="Search proposals">
+                @if ($isReviewer)
+                    <span class="filter-divider" aria-hidden="true"></span>
+                    <label class="filter-select">
+                        <span class="status-dot {{ $filters['status'] ?? 'all' }}" aria-hidden="true"></span>
+                        <select name="status" aria-label="Filter by status" onchange="this.form.requestSubmit()">
+                            <option value="">All statuses</option>
+                            @foreach (\App\Enums\ProposalStatus::cases() as $status)
+                                <option value="{{ $status->value }}" @selected(($filters['status'] ?? '') === $status->value)>{{ $status->label() }}</option>
+                            @endforeach
+                        </select>
+                        <svg class="filter-chevron" width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="m4 6 4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </label>
+                @endif
+                <span class="filter-divider" aria-hidden="true"></span>
+                <input type="number" name="year" value="{{ $filters['year'] ?? '' }}" placeholder="Year" min="1900" max="2100" aria-label="Filter by start year">
+                <button type="submit" class="filter-submit">Filter</button>
+            </div>
+            @if (! empty($filters['search']) || ! empty($filters['year']) || ($isReviewer && ! empty($filters['status'])))
+                <a class="filter-clear" href="{{ route('proposals.index', $isReviewer ? [] : array_filter(['status' => $filters['status'] ?? null])) }}">Clear</a>
+            @endif
             <a class="btn-primary" href="{{ route('proposals.create') }}">
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                     <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>

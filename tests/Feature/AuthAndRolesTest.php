@@ -109,6 +109,28 @@ class AuthAndRolesTest extends TestCase
             ->assertSee('From a proponent');
     }
 
+    public function test_only_reviewers_get_the_status_filter(): void
+    {
+        $this->actingAs(User::factory()->reviewer()->create())
+            ->get('/proposals')
+            ->assertSee('Filter by status');
+
+        $this->actingAs(User::factory()->proponent()->create())
+            ->get('/proposals')
+            ->assertDontSee('Filter by status');
+    }
+
+    public function test_reviewer_can_filter_by_status(): void
+    {
+        Proposal::factory()->approved()->create(['title' => 'Approved one']);
+        Proposal::factory()->unreviewed()->create(['title' => 'New one']);
+
+        $this->actingAs(User::factory()->reviewer()->create())
+            ->get('/proposals?status=approved')
+            ->assertSee('Approved one')
+            ->assertDontSee('New one');
+    }
+
     public function test_proponent_cannot_approve_or_disapprove_even_their_own(): void
     {
         $proponent = User::factory()->proponent()->create();
