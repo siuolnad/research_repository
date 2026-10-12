@@ -26,7 +26,7 @@ final class ProposalFactory extends Factory
         return [
             'title' => fake()->sentence(6),
             'abstract' => fake()->paragraphs(3, asText: true),
-            'proponents' => [fake()->name(), fake()->name()],
+            'proponent' => fake()->name(),
             'objectives' => fake()->sentences(3),
             'keywords' => fake()->words(3),
             'research_area' => fake()->randomElement(ResearchArea::cases()),

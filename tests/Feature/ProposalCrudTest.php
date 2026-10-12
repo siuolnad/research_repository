@@ -32,7 +32,7 @@ class ProposalCrudTest extends TestCase
         return array_merge([
             'title' => 'Effects of sleep on memory',
             'abstract' => str_repeat('Sleep consolidates memory. ', 5),
-            'proponents' => 'Ada Lovelace, Alan Turing',
+            'proponent' => 'Ada Lovelace',
             'objectives' => "Measure recall\nCompare sleep groups",
             'keywords' => 'sleep, memory',
             'research_area' => 'health',
@@ -75,7 +75,7 @@ class ProposalCrudTest extends TestCase
 
         $proposal = Proposal::firstOrFail();
         $response->assertRedirect(route('proposals.show', $proposal->id));
-        $this->assertSame(['Ada Lovelace', 'Alan Turing'], $proposal->proponents);
+        $this->assertSame('Ada Lovelace', $proposal->proponent);
         $this->assertSame(['Measure recall', 'Compare sleep groups'], $proposal->objectives);
         $this->assertSame(['sleep', 'memory'], $proposal->keywords);
         $this->assertSame(ResearchArea::Health, $proposal->research_area);
@@ -87,7 +87,7 @@ class ProposalCrudTest extends TestCase
     {
         $this->post('/proposals', ['title' => '', 'abstract' => 'short'])
             ->assertSessionHasErrors([
-                'title', 'abstract', 'proponents', 'objectives',
+                'title', 'abstract', 'proponent', 'objectives',
                 'research_area', 'start_date', 'end_date', 'budget',
             ]);
 

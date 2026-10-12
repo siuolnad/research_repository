@@ -19,7 +19,6 @@ class ProposalRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'proponents' => $this->toList($this->input('proponents'), ','),
             'objectives' => $this->toList($this->input('objectives'), "\n"),
             'keywords' => $this->toList($this->input('keywords'), ','),
         ]);
@@ -34,8 +33,7 @@ class ProposalRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'abstract' => ['required', 'string', 'min:50'],
 
-            'proponents' => ['required', 'array', 'min:1'],
-            'proponents.*' => ['required', 'string', 'max:255'],
+            'proponent' => ['required', 'string', 'max:255'],
 
             'objectives' => ['required', 'array', 'min:1'],
             'objectives.*' => ['required', 'string', 'max:1000'],

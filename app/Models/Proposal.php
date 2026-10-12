@@ -19,7 +19,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $user_id
  * @property string $title
  * @property string $abstract
- * @property array<int, string> $proponents
+ * @property string $proponent
  * @property array<int, string> $objectives
  * @property array<int, string>|null $keywords
  * @property ResearchArea $research_area
@@ -41,7 +41,7 @@ class Proposal extends Model
         'user_id',
         'title',
         'abstract',
-        'proponents',
+        'proponent',
         'objectives',
         'keywords',
         'research_area',
@@ -55,7 +55,7 @@ class Proposal extends Model
     /**
      * @return BelongsTo<User, $this>
      */
-    public function proponent(): BelongsTo
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -82,7 +82,6 @@ class Proposal extends Model
     protected function casts(): array
     {
         return [
-            'proponents' => 'array',
             'objectives' => 'array',
             'keywords' => 'array',
             'research_area' => ResearchArea::class,

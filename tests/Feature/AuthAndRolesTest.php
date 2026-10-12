@@ -23,7 +23,7 @@ class AuthAndRolesTest extends TestCase
         return array_merge([
             'title' => 'Effects of sleep on memory',
             'abstract' => str_repeat('Sleep consolidates memory. ', 5),
-            'proponents' => 'Ada Lovelace',
+            'proponent' => 'Ada Lovelace',
             'objectives' => 'Measure recall',
             'research_area' => 'health',
             'start_date' => '2026-01-01',

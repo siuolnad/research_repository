@@ -22,11 +22,10 @@
     @error('abstract')<div class="err">{{ $message }}</div>@enderror
 </div>
 
-<div class="field {{ $errors->has('proponents') || $errors->has('proponents.*') ? 'has-err' : '' }}">
-    <label for="in-proponents">Proponents <span class="hint">separate with commas</span></label>
-    <input id="in-proponents" name="proponents" value="{{ $list('proponents', $proposal?->proponents) }}" placeholder="Ada Lovelace, Alan Turing" required>
-    @error('proponents')<div class="err">{{ $message }}</div>@enderror
-    @error('proponents.*')<div class="err">{{ $message }}</div>@enderror
+<div class="field {{ $errors->has('proponent') ? 'has-err' : '' }}">
+    <label for="in-proponent">Proponent</label>
+    <input id="in-proponent" name="proponent" value="{{ $val('proponent', $proposal?->proponent) }}" placeholder="Ada Lovelace" required maxlength="255">
+    @error('proponent')<div class="err">{{ $message }}</div>@enderror
 </div>
 
 <div class="field {{ $errors->has('objectives') || $errors->has('objectives.*') ? 'has-err' : '' }}">

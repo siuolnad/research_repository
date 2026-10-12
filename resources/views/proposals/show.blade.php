@@ -15,7 +15,7 @@
         </div>
 
         <h1>{{ $proposal->title }}</h1>
-        <div class="byline">{{ implode(', ', $proposal->proponents) }}</div>
+        <div class="byline">{{ $proposal->proponent }}</div>
 
         @if ($proposal->status === \App\Enums\ProposalStatus::Disapproved && $proposal->remarks)
             <div class="remarks">

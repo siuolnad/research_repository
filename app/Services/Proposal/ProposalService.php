@@ -22,7 +22,7 @@ final readonly class ProposalService
     private const FIELD_LABELS = [
         'title' => 'title',
         'abstract' => 'abstract',
-        'proponents' => 'proponents',
+        'proponent' => 'proponent',
         'objectives' => 'objectives',
         'research_area' => 'research area',
         'start_date' => 'start date',

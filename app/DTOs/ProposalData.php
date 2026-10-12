@@ -9,14 +9,13 @@ use App\Enums\ResearchArea;
 final readonly class ProposalData
 {
     /**
-     * @param  array<int, string>  $proponents
      * @param  array<int, string>  $objectives
      * @param  array<int, string>|null  $keywords
      */
     public function __construct(
         public string $title,
         public string $abstract,
-        public array $proponents,
+        public string $proponent,
         public array $objectives,
         public ResearchArea $researchArea,
         public string $startDate,
@@ -33,7 +32,7 @@ final readonly class ProposalData
         return new self(
             title: $validated['title'],
             abstract: $validated['abstract'],
-            proponents: $validated['proponents'],
+            proponent: $validated['proponent'],
             objectives: $validated['objectives'],
             researchArea: ResearchArea::from($validated['research_area']),
             startDate: $validated['start_date'],
@@ -51,7 +50,7 @@ final readonly class ProposalData
         return [
             'title' => $this->title,
             'abstract' => $this->abstract,
-            'proponents' => $this->proponents,
+            'proponent' => $this->proponent,
             'objectives' => $this->objectives,
             'keywords' => $this->keywords,
             'research_area' => $this->researchArea,
