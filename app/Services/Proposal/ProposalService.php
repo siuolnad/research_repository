@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Proposal;
 
 use App\DTOs\ProposalData;
+use App\Enums\ProposalEvent;
 use App\Enums\ProposalStatus;
 use App\Exceptions\ProposalAlreadyDecidedException;
 use App\Models\Proposal;
@@ -17,6 +18,19 @@ use Illuminate\Support\Facades\Storage;
 
 final readonly class ProposalService
 {
+    /** Proposal fields that are recorded in the history when edited. */
+    private const FIELD_LABELS = [
+        'title' => 'title',
+        'abstract' => 'abstract',
+        'proponents' => 'proponents',
+        'objectives' => 'objectives',
+        'research_area' => 'research area',
+        'start_date' => 'start date',
+        'end_date' => 'end date',
+        'budget' => 'budget',
+        'keywords' => 'keywords',
+    ];
+
     public function __construct(
         private ProposalRepositoryInterface $proposals,
     ) {}
@@ -36,9 +50,13 @@ final readonly class ProposalService
 
     public function create(ProposalData $data): Proposal
     {
-        return DB::transaction(
-            fn (): Proposal => $this->proposals->create($data)
-        );
+        return DB::transaction(function () use ($data): Proposal {
+            $proposal = $this->proposals->create($data);
+
+            $this->proposals->addHistory($proposal, ProposalEvent::Created);
+
+            return $proposal;
+        });
     }
 
     /**
@@ -60,9 +78,21 @@ final readonly class ProposalService
     {
         $proposal = $this->getEditable($id);
 
-        return DB::transaction(
-            fn (): Proposal => $this->proposals->update($proposal, $data)
-        );
+        return DB::transaction(function () use ($proposal, $data): Proposal {
+            $proposal = $this->proposals->update($proposal, $data);
+
+            $changed = collect(self::FIELD_LABELS)
+                ->filter(fn (string $label, string $field): bool => $proposal->wasChanged($field))
+                ->values();
+
+            $this->proposals->addHistory(
+                $proposal,
+                ProposalEvent::Updated,
+                $changed->isNotEmpty() ? 'Changed '.$changed->implode(', ').'.' : 'Saved with no changes.',
+            );
+
+            return $proposal;
+        });
     }
 
     /**
@@ -73,6 +103,8 @@ final readonly class ProposalService
     public function addFiles(int $proposalId, array $files): void
     {
         $proposal = $this->proposals->findById($proposalId);
+
+        $names = [];
 
         foreach ($files as $file) {
             // UploadedFile::store() relies on realpath(), which fails for PHP's upload temp dir
@@ -86,6 +118,12 @@ final readonly class ProposalService
                 'mime_type' => $file->getClientMimeType(),
                 'size' => $file->getSize(),
             ]);
+
+            $names[] = $file->getClientOriginalName();
+        }
+
+        if ($names !== []) {
+            $this->proposals->addHistory($proposal, ProposalEvent::FileAdded, implode(', ', $names));
         }
     }
 
@@ -98,8 +136,14 @@ final readonly class ProposalService
     {
         $file = $this->findFile($proposalId, $fileId);
 
-        DB::transaction(function () use ($file): void {
+        DB::transaction(function () use ($file, $proposalId): void {
             $this->proposals->deleteFile($file);
+
+            $this->proposals->addHistory(
+                $this->proposals->findById($proposalId),
+                ProposalEvent::FileRemoved,
+                $file->name,
+            );
         });
 
         Storage::delete($file->path);
@@ -112,9 +156,17 @@ final readonly class ProposalService
     {
         $proposal = $this->getEditable($id);
 
-        return DB::transaction(
-            fn (): Proposal => $this->proposals->updateStatus($proposal, $decision, $remarks)
-        );
+        return DB::transaction(function () use ($proposal, $decision, $remarks): Proposal {
+            $proposal = $this->proposals->updateStatus($proposal, $decision, $remarks);
+
+            $this->proposals->addHistory(
+                $proposal,
+                $decision === ProposalStatus::Approved ? ProposalEvent::Approved : ProposalEvent::Disapproved,
+                $remarks,
+            );
+
+            return $proposal;
+        });
     }
 
     public function delete(int $id): void

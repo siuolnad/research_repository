@@ -223,6 +223,71 @@ class ProposalCrudTest extends TestCase
         $this->post("/proposals/{$proposal->id}/files", [])->assertSessionHasErrors('files');
     }
 
+    /**
+     * @return array<int, string>
+     */
+    private function events(Proposal $proposal): array
+    {
+        return $proposal->history()->get()->map(fn ($h) => $h->event->value)->all();
+    }
+
+    public function test_history_records_the_whole_lifecycle(): void
+    {
+        Storage::fake();
+
+        $this->post('/proposals', $this->payload());
+        $proposal = Proposal::firstOrFail();
+
+        $this->put("/proposals/{$proposal->id}", $this->payload(['title' => 'Renamed', 'budget' => '1000']));
+        $this->post("/proposals/{$proposal->id}/files", [
+            'files' => [UploadedFile::fake()->create('plan.pdf', 10, 'application/pdf')],
+        ]);
+        $this->delete("/proposals/{$proposal->id}/files/{$proposal->files()->firstOrFail()->id}");
+        $this->post("/proposals/{$proposal->id}/disapprove", ['remarks' => 'Too costly.']);
+
+        $this->assertSame(
+            ['created', 'updated', 'file_added', 'file_removed', 'disapproved'],
+            $this->events($proposal),
+        );
+
+        $history = $proposal->history()->get();
+        $this->assertSame('Changed title, budget.', $history[1]->description);
+        $this->assertSame('plan.pdf', $history[2]->description);
+        $this->assertSame('Too costly.', $history[4]->description);
+    }
+
+    public function test_edit_without_changes_is_still_logged(): void
+    {
+        $this->post('/proposals', $this->payload());
+        $proposal = Proposal::firstOrFail();
+
+        $this->put("/proposals/{$proposal->id}", $this->payload());
+
+        $this->assertSame(['created', 'updated'], $this->events($proposal));
+        $this->assertSame('Saved with no changes.', $proposal->history()->get()[1]->description);
+    }
+
+    public function test_approval_is_logged(): void
+    {
+        $proposal = Proposal::factory()->unreviewed()->create();
+
+        $this->post("/proposals/{$proposal->id}/approve");
+
+        $this->assertSame(['approved'], $this->events($proposal));
+    }
+
+    public function test_show_renders_timeline_with_pending_step_only_while_new(): void
+    {
+        $new = Proposal::factory()->unreviewed()->create();
+        $approved = Proposal::factory()->unreviewed()->create();
+        $this->post("/proposals/{$approved->id}/approve");
+
+        $this->get("/proposals/{$new->id}")->assertSee('Awaiting decision');
+        $this->get("/proposals/{$approved->id}")
+            ->assertSee('Proposal approved')
+            ->assertDontSee('Awaiting decision');
+    }
+
     public function test_file_of_another_proposal_is_not_reachable(): void
     {
         Storage::fake();

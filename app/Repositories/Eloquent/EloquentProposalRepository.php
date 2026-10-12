@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories\Eloquent;
 
 use App\DTOs\ProposalData;
+use App\Enums\ProposalEvent;
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use App\Models\ProposalFile;
@@ -52,7 +53,7 @@ final class EloquentProposalRepository implements ProposalRepositoryInterface
     {
         $proposal->update($data->toDatabase());
 
-        return $proposal->fresh();
+        return $proposal;
     }
 
     public function updateStatus(Proposal $proposal, ProposalStatus $status, ?string $remarks = null): Proposal
@@ -80,5 +81,10 @@ final class EloquentProposalRepository implements ProposalRepositoryInterface
     public function deleteFile(ProposalFile $file): void
     {
         $file->delete();
+    }
+
+    public function addHistory(Proposal $proposal, ProposalEvent $event, ?string $description = null): void
+    {
+        $proposal->history()->create(['event' => $event, 'description' => $description]);
     }
 }

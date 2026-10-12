@@ -58,6 +58,14 @@ class Proposal extends Model
     }
 
     /**
+     * @return HasMany<ProposalHistory, $this>
+     */
+    public function history(): HasMany
+    {
+        return $this->hasMany(ProposalHistory::class)->oldest('id');
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array

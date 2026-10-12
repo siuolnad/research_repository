@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories\Contracts;
 
 use App\DTOs\ProposalData;
+use App\Enums\ProposalEvent;
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use App\Models\ProposalFile;
@@ -42,4 +43,6 @@ interface ProposalRepositoryInterface
     public function findFile(Proposal $proposal, int $fileId): ProposalFile;
 
     public function deleteFile(ProposalFile $file): void;
+
+    public function addHistory(Proposal $proposal, ProposalEvent $event, ?string $description = null): void;
 }
