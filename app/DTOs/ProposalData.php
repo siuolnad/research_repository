@@ -15,7 +15,6 @@ final readonly class ProposalData
     public function __construct(
         public string $title,
         public string $abstract,
-        public string $proponent,
         public array $objectives,
         public ResearchArea $researchArea,
         public string $startDate,
@@ -32,7 +31,6 @@ final readonly class ProposalData
         return new self(
             title: $validated['title'],
             abstract: $validated['abstract'],
-            proponent: $validated['proponent'],
             objectives: $validated['objectives'],
             researchArea: ResearchArea::from($validated['research_area']),
             startDate: $validated['start_date'],
@@ -50,7 +48,6 @@ final readonly class ProposalData
         return [
             'title' => $this->title,
             'abstract' => $this->abstract,
-            'proponent' => $this->proponent,
             'objectives' => $this->objectives,
             'keywords' => $this->keywords,
             'research_area' => $this->researchArea,

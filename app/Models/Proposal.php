@@ -19,7 +19,6 @@ use Illuminate\Support\Carbon;
  * @property int|null $user_id
  * @property string $title
  * @property string $abstract
- * @property string $proponent
  * @property array<int, string> $objectives
  * @property array<int, string>|null $keywords
  * @property ResearchArea $research_area
@@ -41,7 +40,6 @@ class Proposal extends Model
         'user_id',
         'title',
         'abstract',
-        'proponent',
         'objectives',
         'keywords',
         'research_area',

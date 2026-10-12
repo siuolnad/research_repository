@@ -22,12 +22,6 @@
     @error('abstract')<div class="err">{{ $message }}</div>@enderror
 </div>
 
-<div class="field {{ $errors->has('proponent') ? 'has-err' : '' }}">
-    <label for="in-proponent">Proponent</label>
-    <input id="in-proponent" name="proponent" value="{{ $val('proponent', $proposal?->proponent) }}" placeholder="Ada Lovelace" required maxlength="255">
-    @error('proponent')<div class="err">{{ $message }}</div>@enderror
-</div>
-
 <div class="field {{ $errors->has('objectives') || $errors->has('objectives.*') ? 'has-err' : '' }}">
     <label for="in-objectives">Objectives <span class="hint">one per line</span></label>
     <textarea id="in-objectives" name="objectives" required>{{ $list('objectives', $proposal?->objectives, "\n") }}</textarea>

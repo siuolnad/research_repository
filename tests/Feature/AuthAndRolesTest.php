@@ -23,7 +23,6 @@ class AuthAndRolesTest extends TestCase
         return array_merge([
             'title' => 'Effects of sleep on memory',
             'abstract' => str_repeat('Sleep consolidates memory. ', 5),
-            'proponent' => 'Ada Lovelace',
             'objectives' => 'Measure recall',
             'research_area' => 'health',
             'start_date' => '2026-01-01',
@@ -77,6 +76,16 @@ class AuthAndRolesTest extends TestCase
         $this->actingAs($proponent)->post('/proposals', $this->payload())->assertSessionHasNoErrors();
 
         $this->assertSame($proponent->id, Proposal::firstOrFail()->user_id);
+    }
+
+    public function test_proposal_shows_the_name_of_its_owner_as_proponent(): void
+    {
+        $owner = User::factory()->proponent()->create(['name' => 'Ada Lovelace']);
+        $proposal = Proposal::factory()->create(['user_id' => $owner->id]);
+
+        $this->actingAs($owner)->get('/proposals')->assertSee('Ada Lovelace');
+        $this->get("/proposals/{$proposal->id}")->assertSee('Ada Lovelace');
+        $this->get("/proposals/{$proposal->id}/edit")->assertDontSee('name="proponent"', false);
     }
 
     public function test_proponent_only_sees_their_own_proposals(): void

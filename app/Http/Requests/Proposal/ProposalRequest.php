@@ -33,8 +33,6 @@ class ProposalRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'abstract' => ['required', 'string', 'min:50'],
 
-            'proponent' => ['required', 'string', 'max:255'],
-
             'objectives' => ['required', 'array', 'min:1'],
             'objectives.*' => ['required', 'string', 'max:1000'],
 

@@ -65,7 +65,7 @@
                             <span class="docket-badge">₱{{ number_format((float) $proposal->budget, 2) }}</span>
                         </div>
                         <h2><a href="{{ route('proposals.show', $proposal->id) }}">{{ $proposal->title }}</a></h2>
-                        <div class="byline">{{ $proposal->proponent }}</div>
+                        <div class="byline">{{ $proposal->owner?->name ?? 'Unassigned' }}</div>
                         <div class="meta-line">{{ $proposal->start_date->format('M j, Y') }} – {{ $proposal->end_date->format('M j, Y') }}</div>
                     </div>
                     <span class="status-pill {{ $proposal->status->value }}">{{ $proposal->status->label() }}</span>

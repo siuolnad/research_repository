@@ -18,6 +18,7 @@ final class EloquentProposalRepository implements ProposalRepositoryInterface
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         return Proposal::query()
+            ->with('owner')
             ->when(
                 $filters['user_id'] ?? null,
                 fn (Builder $q, int $userId) => $q->where('user_id', $userId)
