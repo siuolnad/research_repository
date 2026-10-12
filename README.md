@@ -1,58 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Research Repository
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A Laravel app for managing research proposals. Proponents submit proposals with objectives, a research area, a schedule, a budget and supporting files. Reviewers approve or disapprove them, and every change is recorded in a history log.
 
-## About Laravel
+## Requirements
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+| Tool | Version used in development |
+|---|---|
+| PHP | 8.4.12 (minimum 8.3) |
+| Laravel | 13.35.0 |
+| MySQL | 8.4.3 |
+| Composer | 2.x |
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Required PHP extensions: `fileinfo`, `mbstring`, `openssl`, `pdo_mysql`, `pdo_sqlite` (tests), `ctype`, `json`, `tokenizer`, `xml`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Setup
 
-## Learning Laravel
+1. Clone the repository and install dependencies:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+   ```sh
+   git clone https://github.com/siuolnad/research_repository.git
+   cd research_repository
+   composer install
+   ```
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Create the environment file and app key:
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+   ```sh
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## Agentic Development
+3. Create an empty MySQL database named `research_repository`, then check the `DB_*` values in `.env`. The defaults are:
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+   ```
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=research_repository
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
 
-```bash
-composer require laravel/boost --dev
+4. Create the tables and load the demo data (two accounts and 25 sample proposals):
 
-php artisan boost:install
+   ```sh
+   php artisan migrate --seed
+   ```
+
+5. Create the storage link:
+
+   ```sh
+   php artisan storage:link
+   ```
+
+6. Start the app:
+
+   ```sh
+   php artisan serve
+   ```
+
+   Then open <http://localhost:8000>. If you serve the project through Apache (for example Laragon), open the `public` folder's URL instead.
+
+## Login credentials
+
+The seeder creates two test accounts. Both use the password `password`.
+
+| Role | Email | Password |
+|---|---|---|
+| Proponent | `proponent@example.com` | `password` |
+| Reviewer | `reviewer@example.com` | `password` |
+
+Change or remove these accounts before using the app anywhere other than your own machine. There is no registration page; create further accounts with `php artisan tinker`.
+
+## Roles
+
+- **Proponent** adds proposals and edits their own while they are New. A proponent sees only their own proposals and cannot approve or disapprove.
+- **Reviewer** sees every proposal, can add and edit, and is the only role that can approve or disapprove. Disapproving requires remarks.
+- Once a proposal is approved or disapproved, its details are locked. Supporting files can still be added or removed.
+
+## Supporting files
+
+- PDF, DOC, DOCX and XLSX only, 10 MB each, up to 10 files per upload.
+- Files are saved in `storage/app/private` and downloaded through the app, so only people allowed to see a proposal can download its files.
+- PHP's `upload_max_filesize` and `post_max_size` must be above 10 MB. If uploads fail on Windows with "Path must not be empty", set `upload_tmp_dir` in `php.ini` to a normal folder.
+
+## Tests
+
+```sh
+php artisan test
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The tests run on an in-memory SQLite database (set in `phpunit.xml`), so they never touch your MySQL data. This needs the `pdo_sqlite` PHP extension.
