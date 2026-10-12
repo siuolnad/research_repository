@@ -19,6 +19,10 @@ final class EloquentProposalRepository implements ProposalRepositoryInterface
     {
         return Proposal::query()
             ->when(
+                $filters['user_id'] ?? null,
+                fn (Builder $q, int $userId) => $q->where('user_id', $userId)
+            )
+            ->when(
                 $filters['status'] ?? null,
                 fn (Builder $q, string $status) => $q->where('status', $status)
             )
@@ -44,9 +48,9 @@ final class EloquentProposalRepository implements ProposalRepositoryInterface
         return Proposal::query()->findOrFail($id);
     }
 
-    public function create(ProposalData $data): Proposal
+    public function create(ProposalData $data, int $userId): Proposal
     {
-        return Proposal::query()->create($data->toDatabase());
+        return Proposal::query()->create($data->toDatabase() + ['user_id' => $userId]);
     }
 
     public function update(Proposal $proposal, ProposalData $data): Proposal

@@ -73,15 +73,16 @@ if (document.documentElement.getAttribute('data-rail') === '1') {
     </nav>
 
     <div class="side-foot">
-        <form class="role-switch" method="POST" action="{{ route('role.update') }}" aria-label="Switch role">
-            @csrf
-            <span class="role-label">Viewing as</span>
-            <div class="role-options">
-                @foreach (\App\Enums\UserRole::cases() as $role)
-                    <button type="submit" name="role" value="{{ $role->value }}" class="{{ \App\Enums\UserRole::current() === $role ? 'active' : '' }}" aria-pressed="{{ \App\Enums\UserRole::current() === $role ? 'true' : 'false' }}">{{ $role->label() }}</button>
-                @endforeach
+        <div class="account">
+            <div class="account-info">
+                <span class="account-name">{{ auth()->user()->name }}</span>
+                <span class="account-role">{{ auth()->user()->role->label() }}</span>
             </div>
-        </form>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="account-out">Sign out</button>
+            </form>
+        </div>
         <button class="theme-toggle" id="theme-toggle" title="Switch to dark mode" aria-label="Switch to dark mode">
             <svg class="icon-moon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <path d="M13.5 9.3A5.6 5.6 0 0 1 6.7 2.5a5.6 5.6 0 1 0 6.8 6.8Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>

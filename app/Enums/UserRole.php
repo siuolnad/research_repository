@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use Illuminate\Support\Facades\Auth;
+
 enum UserRole: string
 {
     case Proponent = 'proponent';
     case Reviewer = 'reviewer';
 
     /**
-     * The role the visitor is acting as. There are no accounts yet, so it lives in the session.
+     * The role of the signed-in user.
      */
     public static function current(): self
     {
-        return self::tryFrom((string) session('role')) ?? self::Proponent;
+        return Auth::user()?->role ?? self::Proponent;
     }
 
     public function label(): string

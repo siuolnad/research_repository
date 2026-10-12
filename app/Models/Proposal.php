@@ -9,12 +9,14 @@ use App\Enums\ResearchArea;
 use Database\Factories\ProposalFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
+ * @property int|null $user_id
  * @property string $title
  * @property string $abstract
  * @property array<int, string> $proponents
@@ -36,6 +38,7 @@ class Proposal extends Model
 
     /** @var list<string> */
     protected $fillable = [
+        'user_id',
         'title',
         'abstract',
         'proponents',
@@ -48,6 +51,14 @@ class Proposal extends Model
         'status',
         'remarks',
     ];
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function proponent(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     /**
      * @return HasMany<ProposalFile, $this>

@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 interface ProposalRepositoryInterface
 {
     /**
-     * @param  array{status?: string, year?: int|string, search?: string}  $filters
+     * @param  array{status?: string, year?: int|string, search?: string, user_id?: int}  $filters
      */
     public function paginate(array $filters = [], int $perPage = 15): LengthAwarePaginator;
 
@@ -24,7 +24,7 @@ interface ProposalRepositoryInterface
      */
     public function findById(int $id): Proposal;
 
-    public function create(ProposalData $data): Proposal;
+    public function create(ProposalData $data, int $userId): Proposal;
 
     public function update(Proposal $proposal, ProposalData $data): Proposal;
 

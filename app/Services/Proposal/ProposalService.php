@@ -36,7 +36,7 @@ final readonly class ProposalService
     ) {}
 
     /**
-     * @param  array{status?: string, year?: int|string, search?: string}  $filters
+     * @param  array{status?: string, year?: int|string, search?: string, user_id?: int}  $filters
      */
     public function list(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
@@ -48,10 +48,10 @@ final readonly class ProposalService
         return $this->proposals->findById($id);
     }
 
-    public function create(ProposalData $data): Proposal
+    public function create(ProposalData $data, int $userId): Proposal
     {
-        return DB::transaction(function () use ($data): Proposal {
-            $proposal = $this->proposals->create($data);
+        return DB::transaction(function () use ($data, $userId): Proposal {
+            $proposal = $this->proposals->create($data, $userId);
 
             $this->proposals->addHistory($proposal, ProposalEvent::Created);
 
