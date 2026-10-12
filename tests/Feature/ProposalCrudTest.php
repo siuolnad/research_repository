@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Enums\ProposalStatus;
 use App\Enums\ResearchArea;
+use App\Enums\UserRole;
 use App\Models\Proposal;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -15,6 +16,13 @@ use Tests\TestCase;
 class ProposalCrudTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withSession(['role' => 'reviewer']);
+    }
 
     /**
      * @return array<string, mixed>
@@ -327,6 +335,45 @@ class ProposalCrudTest extends TestCase
 
         $this->assertSame('Original', $proposal->fresh()->title);
         $this->get("/proposals/{$proposal->id}")->assertDontSee("/proposals/{$proposal->id}/edit");
+    }
+
+    public function test_role_defaults_to_proponent_and_can_be_switched(): void
+    {
+        $this->flushSession();
+
+        $this->get('/proposals')->assertSee('Viewing as');
+        $this->assertSame(UserRole::Proponent, UserRole::current());
+
+        $this->post('/role', ['role' => 'reviewer'])->assertSessionHas('role', 'reviewer');
+        $this->post('/role', ['role' => 'admin'])->assertSessionHasErrors('role');
+    }
+
+    public function test_proponent_cannot_approve_or_disapprove(): void
+    {
+        $proposal = Proposal::factory()->unreviewed()->create();
+        $this->withSession(['role' => 'proponent']);
+
+        $this->post("/proposals/{$proposal->id}/approve")->assertForbidden();
+        $this->post("/proposals/{$proposal->id}/disapprove", ['remarks' => 'No.'])->assertForbidden();
+
+        $this->assertSame(ProposalStatus::New, $proposal->fresh()->status);
+        $this->assertDatabaseCount('proposal_histories', 0);
+    }
+
+    public function test_proponent_does_not_see_decision_actions_but_can_still_edit(): void
+    {
+        $proposal = Proposal::factory()->unreviewed()->create();
+        $this->withSession(['role' => 'proponent']);
+
+        $this->get("/proposals/{$proposal->id}")
+            ->assertDontSee("/proposals/{$proposal->id}/approve")
+            ->assertDontSee("/proposals/{$proposal->id}/disapprove")
+            ->assertSee("/proposals/{$proposal->id}/edit")
+            ->assertSee('A reviewer will approve or disapprove this proposal.');
+
+        $this->put("/proposals/{$proposal->id}", $this->payload(['title' => 'By proponent']))
+            ->assertRedirect(route('proposals.show', $proposal->id));
+        $this->assertSame('By proponent', $proposal->fresh()->title);
     }
 
     public function test_destroy_soft_deletes(): void

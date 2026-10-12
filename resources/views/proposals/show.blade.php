@@ -215,7 +215,9 @@
                     </div>
                     <div class="tl-content">
                         <div class="tl-title">Awaiting decision</div>
-                        <p class="tl-detail">Approve or disapprove this proposal from Actions.</p>
+                        <p class="tl-detail">
+                            {{ \App\Enums\UserRole::current()->canDecide() ? 'Approve or disapprove this proposal from Actions.' : 'A reviewer will approve or disapprove this proposal.' }}
+                        </p>
                     </div>
                 </li>
             @endif

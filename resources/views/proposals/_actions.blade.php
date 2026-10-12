@@ -21,6 +21,9 @@
                     <path d="M10.8 2.7a1.4 1.4 0 0 1 2 2L5.5 12l-3 .8.8-3 7.5-7.1Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                 </svg>Edit
             </a>
+        @endif
+
+        @if ($proposal->status === \App\Enums\ProposalStatus::New && \App\Enums\UserRole::current()->canDecide())
             <div class="menu-sep" role="separator"></div>
             <form method="POST" action="{{ route('proposals.approve', $proposal->id) }}" onsubmit="return confirm('Approve this proposal? This decision is final.')">
                 @csrf
