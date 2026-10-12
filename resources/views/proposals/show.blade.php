@@ -12,7 +12,6 @@
     <article class="panel detail">
         <div class="case-kicker">
             <span class="status-pill {{ $proposal->status->value }}">{{ $proposal->status->label() }}</span>
-            <span class="division-chip">{{ $proposal->research_area->label() }}</span>
         </div>
 
         <h1>{{ $proposal->title }}</h1>
@@ -25,6 +24,7 @@
             </div>
         @endif
 
+        <h2 class="detail-heading">Abstract</h2>
         <p class="abstract-full">{{ $proposal->abstract }}</p>
 
         <dl>
@@ -36,6 +36,9 @@
                     @endforeach
                 </ol>
             </dd>
+
+            <dt>Research area</dt>
+            <dd>{{ $proposal->research_area->label() }}</dd>
 
             <dt>Start date</dt>
             <dd>{{ $proposal->start_date->format('F j, Y') }}</dd>

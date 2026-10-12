@@ -831,7 +831,8 @@ a.docket-badge:hover { color: var(--brass); }
 
 /* ---------- Detail ---------- */
 .detail h1 { font-family: var(--serif); font-size: 28px; font-weight: 700; line-height: 1.25; }
-.detail .abstract-full { margin-top: 20px; white-space: pre-line; font-size: 15px; }
+.detail .detail-heading { margin-top: 22px; font-family: var(--serif); font-size: 20px; font-weight: 700; letter-spacing: -0.005em; }
+.detail .abstract-full { margin-top: 6px; white-space: pre-line; font-size: 15px; }
 .detail dl { display: grid; grid-template-columns: 140px 1fr; gap: 8px 16px; margin-top: 22px; font-size: 14px; }
 .detail dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); padding-top: 3px; }
 .detail dd { word-break: break-word; }
