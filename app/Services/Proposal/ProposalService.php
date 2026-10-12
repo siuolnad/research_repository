@@ -75,9 +75,14 @@ final readonly class ProposalService
         $proposal = $this->proposals->findById($proposalId);
 
         foreach ($files as $file) {
+            // UploadedFile::store() relies on realpath(), which fails for PHP's upload temp dir
+            // on some Windows setups (C:\Windows\Temp under Apache). Read via the plain path.
+            $path = "proposals/{$proposal->id}/{$file->hashName()}";
+            Storage::put($path, file_get_contents($file->getPathname()));
+
             $this->proposals->addFile($proposal, [
                 'name' => $file->getClientOriginalName(),
-                'path' => $file->store("proposals/{$proposal->id}"),
+                'path' => $path,
                 'mime_type' => $file->getClientMimeType(),
                 'size' => $file->getSize(),
             ]);
